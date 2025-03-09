@@ -25,13 +25,15 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	}
 	api := router.Group("/api", h.userIdentity)
 	{
-		chats := api.Group("chats")
+		chats := api.Group("/chats")
 		{
 			chats.POST("/")
 		}
 
-		users := api.Group("users")
+		users := api.Group("/users")
 		{
+			users.GET("/", h.getAllUsers)
+			users.GET("/:id", h.getUser)
 			users.PUT("/:id", h.updateUser)
 			users.DELETE("/:id", h.deleteUser)
 		}

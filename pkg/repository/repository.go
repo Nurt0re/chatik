@@ -2,7 +2,8 @@ package repository
 
 import (
 	"github.com/Nurt0re/chatik"
-	"github.com/jmoiron/sqlx"
+
+	"gorm.io/gorm"
 )
 
 type Authorization interface {
@@ -10,12 +11,20 @@ type Authorization interface {
 	GetUser(username, password string) (chatik.User, error)
 }
 
+type Updater interface {
+	UpdateUser(id int, input chatik.User) error
+	DeleteUser(id int) error
+	GetUser(id int) (chatik.User, error)
+	GetAllUsers() ([]chatik.User, error)
+}
 type Repository struct {
 	Authorization
+	Updater
 }
 
-func NewRepository(db *sqlx.DB) *Repository {
+func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		Authorization: NewAuthPostgres(db),
+		Updater:	   NewUpdPostgres(db),
 	}
 }

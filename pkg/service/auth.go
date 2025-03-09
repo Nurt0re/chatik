@@ -32,6 +32,7 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 	}
 }
 
+
 func (s *AuthService) CreateUser(user chatik.User) (int, error) {
 	user.Password = generatePasswordHash(user.Password)
 	return s.repo.CreateUser(user)
@@ -78,7 +79,7 @@ func (s *AuthService) GenerateToken(username, password string) (string, error) {
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
-		user.Id,
+		int(user.Model.ID),
 	})
 
 	return token.SignedString([]byte(signingKey))

@@ -19,13 +19,14 @@ func (h *Handler) updateUser(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
+	
+	// if uint(id) != input.Model.ID {
+	// 	newErrorResponse(c, http.StatusForbidden, "forbidden")
+	// 	return
+	// }
 
-	if id != input.Id {
-		newErrorResponse(c, http.StatusForbidden, "forbidden")
-		return
-	}
-
-	if err := h.services.Authorization.UpdateUser(id, input); err != nil {
+	
+	if err := h.services.Updater.UpdateUser(id, input); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -40,10 +41,36 @@ func (h *Handler) deleteUser(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.Authorization.DeleteUser(id); err != nil {
+	if err := h.services.Updater.DeleteUser(id); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, statusResponse{Status: "ok"})
+}
+
+func (h *Handler) getUser(c *gin.Context) {
+	id, err := getUserId(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	user, err := h.services.Updater.GetUser(id)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
+func (h *Handler) getAllUsers(c *gin.Context) {
+	users, err := h.services.Updater.GetAllUsers()
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
 }

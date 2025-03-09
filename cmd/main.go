@@ -12,7 +12,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
+	_"golang.org/x/oauth2/google"
 )
 
 type App struct{

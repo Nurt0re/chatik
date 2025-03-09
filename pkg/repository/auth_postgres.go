@@ -1,17 +1,18 @@
 package repository
 
 import (
-	"fmt"
+
 
 	"github.com/Nurt0re/chatik"
-	"github.com/jmoiron/sqlx"
+
+	"gorm.io/gorm"
 )
 
 type AuthPostgres struct {
-	db *sqlx.DB
+	db *gorm.DB
 }
 
-func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
+func NewAuthPostgres(db *gorm.DB) *AuthPostgres {
 	return &AuthPostgres{
 		db: db,
 	}
@@ -19,21 +20,19 @@ func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 
 func (r *AuthPostgres) CreateUser(user chatik.User) (int, error) {
 	var id int
-
-	query := fmt.Sprintf("INSERT INTO %s (name, username , password_hash) values ($1, $2 ,$3) RETURNING id", usersTable)
-	row := r.db.QueryRow(query, user.Name, user.Username, user.Password)
-	if err := row.Scan(&id); err != nil {
-		return 0, err
+	result:= r.db.Create(&user)
+	if result.Error != nil {
+		return 0, result.Error
 	}
-
+	id = int(user.ID)
 	return id, nil
-
 }
+
+
 
 func (r *AuthPostgres) GetUser(username, password string) (chatik.User, error) {
 	var user chatik.User
 
-	query := fmt.Sprintf("SELECT id FROM %s WHERE username = $1 AND password_hash = $2", usersTable)
-	err := r.db.Get(&user, query, username, password)
-	return user, err
+	r.db.First(&user, "username = ? AND password = ?", username, password)
+	return user, nil
 }

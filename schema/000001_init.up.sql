@@ -1,8 +1,9 @@
-CREATE TABLE users
-(   
-    id            serial       not null unique,
-    name          varchar(255) not null,
-    username      varchar(255) not null unique,
-    password_hash varchar(255) not null
-
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP NULL
 );
