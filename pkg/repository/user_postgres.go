@@ -36,6 +36,8 @@ func (r *UpdPostgres) GetUser(id int) (chatik.User, error) {
 	}
 	return user, nil
 }
+
+
 func (r *UpdPostgres) GetAllUsers() ([]chatik.User, error) {
 	var users []chatik.User
 	if err := r.db.Find(&users).Error; err != nil {

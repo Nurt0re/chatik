@@ -30,9 +30,9 @@ func (r *AuthPostgres) CreateUser(user chatik.User) (int, error) {
 
 
 
-func (r *AuthPostgres) GetUser(username, password string) (chatik.User, error) {
+func (r *AuthPostgres) GetUser(email, password string) (chatik.User, error) {
 	var user chatik.User
 
-	r.db.First(&user, "username = ? AND password = ?", username, password)
+	r.db.First(&user, "email = ? AND password = ?", email, password)
 	return user, nil
 }

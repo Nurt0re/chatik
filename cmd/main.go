@@ -8,11 +8,13 @@ import (
 	"github.com/Nurt0re/chatik/pkg/handler"
 	"github.com/Nurt0re/chatik/pkg/repository"
 	"github.com/Nurt0re/chatik/pkg/service"
+	"github.com/Nurt0re/chatik/pkg/ws"
+	
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
-	_"golang.org/x/oauth2/google"
+	_ "golang.org/x/oauth2/google"
 )
 
 type App struct{
@@ -47,8 +49,14 @@ func main() {
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 
+	hub:=ws.NewHub()
+	wsHandler:= ws.NewHandler(hub)
+
+	go hub.Run()
+
+
 	srv := new(chatik.Server)
-	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes(wsHandler)); err != nil {
 		log.Fatalf("error occured while starting the server: %s", err.Error())
 	}
 

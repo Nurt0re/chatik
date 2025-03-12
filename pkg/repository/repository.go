@@ -8,7 +8,7 @@ import (
 
 type Authorization interface {
 	CreateUser( user chatik.User) (int, error)
-	GetUser(username, password string) (chatik.User, error)
+	GetUser(email, password string) (chatik.User, error)
 }
 
 type Updater interface {

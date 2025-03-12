@@ -1,10 +1,10 @@
 package chatik
 
-import "gorm.io/gorm"
-
 type User struct {
-	gorm.Model
-	Name     string `gorm:"type:varchar(100);not null" json:"name"`
-	Username string `gorm:"type:varchar(100);uniqueIndex;not null" json:"username"`
+	ID       int    `gorm:"primarykey" json:"id"`
+	Username     string `gorm:"type:varchar(100);not null" json:"username"`
+	Email    string `gorm:"type:varchar(100);uniqueIndex;not null" json:"email"`
 	Password string `gorm:"type:text;not null" json:"password"`
 }
+
+

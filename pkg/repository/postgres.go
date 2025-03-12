@@ -31,6 +31,7 @@ func NewPostgresDB(cfg Config) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	db.Migrator().DropTable(&chatik.User{})
 	err = db.AutoMigrate(&chatik.User{})
 	if err != nil {
 		return nil, err

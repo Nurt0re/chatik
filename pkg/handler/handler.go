@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/Nurt0re/chatik/pkg/service"
 	"github.com/gin-gonic/gin"
+	"github.com/Nurt0re/chatik/pkg/ws"
 )
 
 type Handler struct {
@@ -13,7 +14,7 @@ func NewHandler(services *service.Service) *Handler {
 	return &Handler{services: services}
 }
 
-func (h *Handler) InitRoutes() *gin.Engine {
+func (h *Handler) InitRoutes(wsHandler *ws.Handler) *gin.Engine {
 	router := gin.New()
 
 	auth := router.Group("/auth")
@@ -22,14 +23,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("sign-in", h.signIn)
 		auth.POST("oauth", h.oAuth)
 		auth.POST("callback", h.callback)
+		auth.GET("logout", h.Logout)
 	}
 	api := router.Group("/api", h.userIdentity)
 	{
-		chats := api.Group("/chats")
-		{
-			chats.POST("/")
-		}
-
 		users := api.Group("/users")
 		{
 			users.GET("/", h.getAllUsers)
@@ -37,6 +34,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			users.PUT("/:id", h.updateUser)
 			users.DELETE("/:id", h.deleteUser)
 		}
+	}
+
+	ws:= router.Group("/ws", h.userIdentity)
+	{
+		ws.POST("/createRoom", wsHandler.CreateRoom)
+		ws.GET("/joinRoom/:roomId", wsHandler.JoinRoom)
 	}
 	return router
 }

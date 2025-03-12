@@ -35,15 +35,17 @@ func (h *Handler) signUp(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-
+	// Показывает эти данные в алфавитном порядке, нужно пофиксить
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
+		"id":       id,
+		"username": input.Username,
+		"email":    input.Email,
 	})
 
 }
 
 type signInInput struct {
-	Username string `json:"username" binding:"required"`
+	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -55,15 +57,24 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	token, err := h.services.Authorization.GenerateToken(input.Username, input.Password)
+	token, err := h.services.Authorization.GenerateToken(input.Email, input.Password)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
+	// Set the token in the Authorization header
+	c.Header("Authorization", "Bearer "+token)
+
+	c.SetCookie("jwt", token, 60*60*12, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"token": token,
+		"email": input.Email,
 	})
+}
+func (h *Handler) Logout(c *gin.Context) {
+	c.SetCookie("jwt", "", -1, "", "", false, true)
+	c.JSON(http.StatusOK, gin.H{"message": "logout successful"})
 }
 
 func (h *Handler) oAuth(c *gin.Context) {
@@ -96,7 +107,7 @@ func (h *Handler) callback(c *gin.Context) {
 	// Handle user info response
 	userInfo := struct {
 		ID    string `json:"id"`
-		Username string `json:"username"`
+		Email string `json:"email"`
 	}{}
 
 	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
